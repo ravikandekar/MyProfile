@@ -1,4 +1,4 @@
-import React, {useRef, useEffect} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,132 +7,180 @@ import {
   Linking,
   ScrollView,
   Animated,
-  link
+  Image,
+  Dimensions,
 } from 'react-native';
-import {useTheme} from '../context/ThemeContext';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { useTheme } from '../context/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+const { width } = Dimensions.get('window');
 
-const SocialButton = ({social, index, animationDelay}) => {
+const ContactLink = ({ icon, label, value, onPress, delay }) => {
   const theme = useTheme();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(50)).current;
 
-  useEffect(() => {
+  React.useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1000,
-        delay: index * animationDelay,
+        duration: 500,
+        delay,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 1000,
-        delay: index * animationDelay,
+        duration: 500,
+        delay,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fadeAnim, slideAnim, index, animationDelay]);
-  const handleSocialPress = async (url) => {
-    try {
-      await Linking.openURL(url);
-    } catch (error) {
-      console.error('Error opening URL:', error);
-    }
-  };
-
-  const handlePress = async () => {
-    try {
-      const supported = await Linking.canOpenURL(social.url);
-      if (supported) {
-        await Linking.openURL(social.url);
-      }
-    } catch (error) {
-      console.error('Error opening URL:', error);
-    }
-  };
+  }, []);
 
   return (
-    <AnimatedTouchable
-      onPress={handlePress}
-      style={[
-        styles.socialButton,
-        {
-          backgroundColor: theme.elevation[4],
-          opacity: fadeAnim,
-          transform: [{translateY: slideAnim}],
-        },
-      ]}>
-      <MaterialCommunityIcons
-        name={social.icon}
-        size={28}
-        color={theme.primary}
-        style={styles.socialIcon}
-      />
-      <View style={styles.socialTextContainer}>
-        <Text style={[styles.socialPlatform, {color: theme.text}]}>
-          {social.platform}
-        </Text>
-        <Text style={[styles.socialUsername, {color: theme.textSecondary}]}>
-          {social.username}
-        </Text>
-      </View>
-      <MaterialCommunityIcons
-        name="chevron-right"
-        size={24}
-        color={theme.primary}
-        style={styles.chevron}
-      />
-    </AnimatedTouchable>
+    <TouchableOpacity onPress={onPress}>
+      <Animated.View
+        style={[
+          styles.contactItem,
+          {
+            backgroundColor: theme.surface,
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}>
+        <MaterialCommunityIcons
+          name={icon}
+          size={24}
+          color={theme.primary}
+          style={styles.icon}
+        />
+        <View style={styles.contactInfo}>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>
+            {label}
+          </Text>
+          <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
+        </View>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          size={24}
+          color={theme.primary}
+        />
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
 
-const ContactInfo = ({info, index, animationDelay}) => {
+const ProfileCard = () => {
   const theme = useTheme();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const slideAnim = React.useRef(new Animated.Value(width)).current;
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
-  useEffect(() => {
+  const images = [
+    require('../assets/photos/IMG-20241204-WA0003.jpg'),
+    require('../assets/photos/IMG-20241204-WA0004.jpg'),
+    require('../assets/photos/IMG-20241204-WA0005.jpg'),
+    require('../assets/photos/IMG-20241204-WA0006.jpg'),
+    require('../assets/photos/IMG-20241204-WA0007.jpg'),
+  ];
+
+  React.useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        delay: index * animationDelay,
-        useNativeDriver: true,
-      }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 1000,
-        delay: index * animationDelay,
+        duration: 800,
+        delay: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        delay: 800,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fadeAnim, slideAnim, index, animationDelay]);
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const translateX = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.sequence([
+      Animated.timing(translateX, {
+        toValue: -10,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(translateX, {
+        toValue: 0,
+        friction: 5,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [currentImageIndex]);
 
   return (
     <Animated.View
       style={[
-        styles.infoCard,
+        styles.profileCard,
         {
           backgroundColor: theme.surface,
           opacity: fadeAnim,
-          transform: [{translateY: slideAnim}],
+          transform: [{ translateX: slideAnim }],
         },
       ]}>
-      <MaterialCommunityIcons
-        name={info.icon}
-        size={24}
-        color={theme.primary}
-        style={styles.infoIcon}
-      />
-      <View style={styles.infoTextContainer}>
-        <Text style={[styles.infoLabel, {color: theme.textSecondary}]}>
-          {info.label}
+      <View style={styles.profileImageContainer}>
+        <Animated.Image
+          source={images[currentImageIndex]}
+          style={[
+            styles.profileImage,
+            {
+              transform: [{ translateX }],
+            },
+          ]}
+        />
+        <View style={[styles.statusDot, { backgroundColor: theme.primary }]} />
+        <View style={styles.imageIndicators}>
+          {images.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.indicator,
+                {
+                  backgroundColor:
+                    index === currentImageIndex ? theme.primary : theme.textSecondary,
+                  opacity: index === currentImageIndex ? 1 : 0.5,
+                },
+              ]}
+            />
+          ))}
+        </View>
+      </View>
+      <View style={styles.profileInfo}>
+        <Text style={[styles.profileName, { color: theme.text }]}>
+          Ravi Kandekar
         </Text>
-        <Text style={[styles.infoValue, {color: theme.text}]}>{info.value}</Text>
+        <Text style={[styles.profileTitle, { color: theme.textSecondary }]}>
+          Senior React Native Developer
+        </Text>
+        <View style={styles.statusContainer}>
+          <MaterialCommunityIcons
+            name="circle"
+            size={8}
+            color={theme.primary}
+            style={styles.statusIcon}
+          />
+          <Text style={[styles.statusText, { color: theme.primary }]}>
+            Available for opportunities
+          </Text>
+        </View>
       </View>
     </Animated.View>
   );
@@ -141,78 +189,103 @@ const ContactInfo = ({info, index, animationDelay}) => {
 const ContactScreen = () => {
   const theme = useTheme();
 
-  const contactInfo = [
+  const handlePress = async (type, value) => {
+    try {
+      switch (type) {
+        case 'email':
+          await Linking.openURL(`mailto:${value}`);
+          break;
+        case 'phone':
+          await Linking.openURL(`tel:${value}`);
+          break;
+        case 'whatsapp':
+          await Linking.openURL(`whatsapp://send?phone=${value}`);
+          break;
+        case 'linkedin':
+          await Linking.openURL(value);
+          break;
+        case 'github':
+          await Linking.openURL(value);
+          break;
+        case 'twitter':
+          await Linking.openURL(value);
+          break;
+        default:
+          console.log('Unknown link type');
+      }
+    } catch (error) {
+      console.error('Error opening link:', error);
+    }
+  };
+
+  const contactData = [
     {
       icon: 'email',
       label: 'Email',
       value: 'ravikandekar219@gmail.com',
+      type: 'email',
     },
     {
       icon: 'phone',
       label: 'Phone',
-      value: '+917066104249',
+      value: '+91 7066104249',
+      type: 'phone',
     },
     {
-      icon: 'map-marker',
-      label: 'Location',
-      value: 'Nshik, Maharashtra',
-    },
-  ];
-
-  const socialLinks = [
-    {
-      platform: 'GitHub',
-      username: '@ravikandekar',
-      icon: 'github',
-      url: 'https://github.com/ravikandekar',
-    },
-    {
-      platform: 'LinkedIn',
-      username: 'Ravi Kandekar',
-      icon: 'linkedin',
-      url: 'https://www.linkedin.com/in/ravindra-kandekar-a30b66246',
-    },
-    {
-      platform: 'Whatsapp',
-      username: '@ravikandekar',
       icon: 'whatsapp',
-      url: 'https://wa.me/+917066104249',
+      label: 'WhatsApp',
+      value: '+91 7066104249',
+      type: 'whatsapp',
+    },
+    {
+      icon: 'linkedin',
+      label: 'LinkedIn',
+      value: 'linkedin.com/in/ravikandekar',
+      type: 'linkedin',
+      fullUrl: 'https://www.linkedin.com/in/ravindra-kandekar-a30b66246',
+    },
+    {
+      icon: 'github',
+      label: 'GitHub',
+      value: 'github.com/ravikandekar',
+      type: 'github',
+      fullUrl: 'https://github.com/ravikandekar',
+    },
+    {
+      icon: 'twitter',
+      label: 'Twitter',
+      value: '@ravikandekar',
+      type: 'twitter',
+      fullUrl: 'https://twitter.com/ravikandekar',
     },
   ];
 
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: theme.background}]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, {color: theme.text}]}>
-            Contact Information
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: theme.text }]}>Get in Touch</Text>
+          <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
+            Feel free to reach out through any of these platforms
           </Text>
-          {contactInfo.map((info, index) => (
-            <ContactInfo
-              key={index}
-              info={info}
-              index={index}
-              animationDelay={300}
+        </View>
+
+        <View style={styles.contactList}>
+          {contactData.map((item, index) => (
+            <ContactLink
+              key={item.type}
+              icon={item.icon}
+              label={item.label}
+              value={item.value}
+              delay={index * 100}
+              onPress={() => handlePress(item.type, item.fullUrl || item.value)}
             />
           ))}
         </View>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, {color: theme.text}]}>
-            Social Media
-          </Text>
-          {socialLinks.map((social, index) => (
-            
-            <SocialButton
-              key={index}
-              social={social}
-              index={index}
-              animationDelay={300}
-            />
-          ))}
-        </View>
+        <ProfileCard />
       </ScrollView>
     </SafeAreaView>
   );
@@ -223,71 +296,117 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
     padding: 16,
   },
-  section: {
+  header: {
     marginBottom: 24,
   },
-  sectionTitle: {
-    fontSize: 24,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 8,
   },
-  infoCard: {
+  subtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  contactList: {
+    gap: 12,
+    marginBottom: 24,
+  },
+  contactItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    elevation: 4,
+    borderRadius: 12,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  infoIcon: {
+  icon: {
     marginRight: 16,
   },
-  infoTextContainer: {
+  contactInfo: {
     flex: 1,
   },
-  infoLabel: {
+  label: {
     fontSize: 14,
     marginBottom: 4,
   },
-  infoValue: {
+  value: {
     fontSize: 16,
     fontWeight: '500',
   },
-  socialButton: {
+  profileCard: {
+    flexDirection: 'row',
+    padding: 20,
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+  profileImageContainer: {
+    position: 'relative',
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
+  },
+  imageIndicators: {
+    position: 'absolute',
+    bottom: -15,
+    left: 0,
+    right: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  indicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusDot: {
+    position: 'absolute',
+    bottom: 0,
+    right: 16,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  profileInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  profileTitle: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  socialIcon: {
-    marginRight: 16,
+  statusIcon: {
+    marginRight: 4,
   },
-  socialTextContainer: {
-    flex: 1,
-  },
-  socialPlatform: {
-    fontSize: 16,
+  statusText: {
+    fontSize: 12,
     fontWeight: '500',
-    marginBottom: 4,
-  },
-  socialUsername: {
-    fontSize: 14,
-  },
-  chevron: {
-    marginLeft: 8,
   },
 });
 
