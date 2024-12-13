@@ -7,6 +7,7 @@ import {
   Linking,
   ScrollView,
   Animated,
+  link
 } from 'react-native';
 import {useTheme} from '../context/ThemeContext';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -35,6 +36,13 @@ const SocialButton = ({social, index, animationDelay}) => {
       }),
     ]).start();
   }, [fadeAnim, slideAnim, index, animationDelay]);
+  const handleSocialPress = async (url) => {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error('Error opening URL:', error);
+    }
+  };
 
   const handlePress = async () => {
     try {
@@ -137,38 +145,38 @@ const ContactScreen = () => {
     {
       icon: 'email',
       label: 'Email',
-      value: 'john.doe@example.com',
+      value: 'ravikandekar219@gmail.com',
     },
     {
       icon: 'phone',
       label: 'Phone',
-      value: '+1 (555) 123-4567',
+      value: '+917066104249',
     },
     {
       icon: 'map-marker',
       label: 'Location',
-      value: 'San Francisco, CA',
+      value: 'Nshik, Maharashtra',
     },
   ];
 
   const socialLinks = [
     {
       platform: 'GitHub',
-      username: '@johndoe',
+      username: '@ravikandekar',
       icon: 'github',
-      url: 'https://github.com/johndoe',
+      url: 'https://github.com/ravikandekar',
     },
     {
       platform: 'LinkedIn',
-      username: 'John Doe',
+      username: 'Ravi Kandekar',
       icon: 'linkedin',
-      url: 'https://linkedin.com/in/johndoe',
+      url: 'https://www.linkedin.com/in/ravindra-kandekar-a30b66246',
     },
     {
-      platform: 'Twitter',
-      username: '@johndoe',
-      icon: 'twitter',
-      url: 'https://twitter.com/johndoe',
+      platform: 'Whatsapp',
+      username: '@ravikandekar',
+      icon: 'whatsapp',
+      url: 'https://wa.me/+917066104249',
     },
   ];
 
@@ -196,6 +204,7 @@ const ContactScreen = () => {
             Social Media
           </Text>
           {socialLinks.map((social, index) => (
+            
             <SocialButton
               key={index}
               social={social}

@@ -56,10 +56,10 @@ const SplashScreen = ({navigation}) => {
           resizeMode="cover"
         />
         <Animated.Text style={[styles.name, {color: theme.text, opacity: fadeAnim}]}>
-          John Doe
+          Raviii Kandekar
         </Animated.Text>
         <Animated.Text style={[styles.title, {color: theme.textSecondary, opacity: fadeAnim}]}>
-          Senior Software Developer
+          Senior React Native Developer
         </Animated.Text>
       </Animated.View>
     </SafeAreaView>

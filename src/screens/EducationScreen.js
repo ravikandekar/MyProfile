@@ -94,26 +94,26 @@ const EducationScreen = () => {
   const educationData = [
     {
       degree: 'Master of Computer Science',
-      school: 'Stanford University',
-      year: '2020-2022',
+      school: 'Pune University',
+      year: '2020-2023',
       description:
-        'Specialized in Artificial Intelligence and Machine Learning with a focus on Neural Networks and Deep Learning.',
+        'Specialized in Master of Computer Application .',
       achievements: [
-        'Published research paper on Deep Learning applications',
+        
         'Graduated with Distinction',
         'Teaching Assistant for Advanced Algorithms',
       ],
     },
     {
-      degree: 'Bachelor of Engineering',
-      school: 'MIT',
-      year: '2016-2020',
+      degree: 'Bachelor of Compiuter Science',  
+      school: 'Pun University',
+      year: '2017-2020',
       description:
-        'Major in Computer Science with minor in Mathematics. Focus on software engineering and data structures.',
+        'BCA (Bachelor of Computer Applications) in Science focuses on integrating computer science principles with applications in scientific domains, preparing students for technology-driven careers..',
       achievements: [
         "Dean's List for all semesters",
         'Led the university programming team',
-        'Developed an award-winning project',
+ 
       ],
     },
   ];
