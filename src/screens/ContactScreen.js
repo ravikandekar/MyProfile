@@ -9,6 +9,9 @@ import {
   Animated,
   Image,
   Dimensions,
+  Platform,
+  Alert,
+  Clipboard,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -193,28 +196,83 @@ const ContactScreen = () => {
     try {
       switch (type) {
         case 'email':
-          await Linking.openURL(`mailto:${value}`);
+          const canOpenEmail = await Linking.canOpenURL(`mailto:${value}`);
+          if (canOpenEmail) {
+            await Linking.openURL(`mailto:${value}`);
+          } else {
+            // If email client is not available, copy to clipboard
+            await Clipboard.setString(value);
+            Alert.alert(
+              'Email Copied',
+              'Email address has been copied to clipboard.',
+              [{ text: 'OK' }]
+            );
+          }
           break;
+
         case 'phone':
-          await Linking.openURL(`tel:${value}`);
+          const formattedPhoneNumber = value.replace(/[^\d+]/g, '');
+          const phoneUrl = `tel:${formattedPhoneNumber}`;
+          
+          const canOpenPhone = await Linking.canOpenURL(phoneUrl);
+          if (canOpenPhone) {
+            await Linking.openURL(phoneUrl);
+          } else {
+            if (__DEV__) {
+              console.log('Note: Phone calls are not supported in the simulator.');
+            }
+            // Copy phone number to clipboard as fallback
+            await Clipboard.setString(formattedPhoneNumber);
+            Alert.alert(
+              'Phone Number Copied',
+              'Phone number has been copied to clipboard.',
+              [{ text: 'OK' }]
+            );
+          }
           break;
+
         case 'whatsapp':
-          await Linking.openURL(`whatsapp://send?phone=${value}`);
+          const formattedPhone = value.replace(/\s+/g, '');
+          const whatsappUrl = `https://wa.me/${formattedPhone}`;
+          const canOpenWhatsapp = await Linking.canOpenURL(whatsappUrl);
+          
+          if (canOpenWhatsapp) {
+            await Linking.openURL(whatsappUrl);
+          } else {
+            Alert.alert(
+              'WhatsApp Not Available',
+              'Please install WhatsApp to connect.',
+              [{ text: 'OK' }]
+            );
+          }
           break;
+
         case 'linkedin':
-          await Linking.openURL(value);
-          break;
         case 'github':
-          await Linking.openURL(value);
-          break;
         case 'twitter':
-          await Linking.openURL(value);
+          const canOpenUrl = await Linking.canOpenURL(value);
+          if (canOpenUrl) {
+            await Linking.openURL(value);
+          } else {
+            await Clipboard.setString(value);
+            Alert.alert(
+              'Link Copied',
+              'The link has been copied to clipboard.',
+              [{ text: 'OK' }]
+            );
+          }
           break;
+
         default:
           console.log('Unknown link type');
       }
     } catch (error) {
-      console.error('Error opening link:', error);
+      console.error('Error handling link:', error);
+      Alert.alert(
+        'Error',
+        'Unable to open the link. Please try again later.',
+        [{ text: 'OK' }]
+      );
     }
   };
 

@@ -17,7 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const {width, height} = Dimensions.get('window');
 const PROFILE_IMAGE_SIZE = width * 0.4;
-
+ 
 const RocketTrail = ({x, startY, endY, duration, color, onComplete}) => {
   const moveAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -346,7 +346,7 @@ const ProfileScreen = () => {
     {icon: 'github', url: 'https://github.com/ravikandekar'},
     {icon: 'linkedin', url: 'https://www.linkedin.com/in/ravindra-kandekar-a30b66246'},
     {icon: 'whatsapp', url: 'https://wa.me/+917066104249'},
-    {icon: 'email', url: 'ravikandekar219@gmail.com'},
+    // {icon: 'email', url: 'ravikandekar219@gmail.com'},
     {icon: 'instagram', url: 'https://www.instagram.com/raviii_kandekar'},
   ];
 
